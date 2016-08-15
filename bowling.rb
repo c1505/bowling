@@ -3,25 +3,31 @@ class Game
   
   attr_accessor :score
   attr_reader :frames
+  attr_reader :to_frames
+  
   
   def initialize
     @score = 0
-    @frames = []
+    @all_rolls = []
   end
   
   def roll(num)
-    @frames << num
+    @all_rolls << num
   end
   
+  # the last frame needs to be a special case in a different way.  each frame
+  # make into a nested array instead
   def score
     new_frames = []
-    @frames.each_with_index do |score, index|
+    @all_rolls.each_with_index do |score, index|
       counter = 0
-      if strike?(score)
-        arr = [score, (@frames[index + 1]), (@frames[index + 2]) ]
+      if frame_count == index + 1
+        
+      elsif strike?(score)
+        arr = [score, (@all_rolls[index + 1]), (@all_rolls[index + 2]) ]
         counter = arr.compact.reduce(:+)
       elsif spare?(score, index)
-          counter = score + @frames[index + 1]
+          counter = score + @all_rolls[index + 1]
       else
         counter = score
       end
@@ -30,12 +36,26 @@ class Game
     new_frames.reduce(:+)
   end
   
+  def frame_count
+    count = 0
+    @all_rolls.each do |roll|
+      if roll == 10
+        count += 1
+      else
+        count += 0.5
+      end
+    end
+    count
+  end
+    
+      
+      
   def strike?(score)
     score == 10
   end
   
   def spare?(score, index)
-    !strike?(score) && @frames.length.even? && @frames.length > 1 && ( (score + @frames[index - 1]) == 10 ) 
+    !strike?(score) && @all_rolls.length.even? && @all_rolls.length > 1 && ( (score + @all_rolls[index - 1]) == 10 ) 
   end
   
 # 10 for the pins actually knocked down in that frame when a strike is rolled, 

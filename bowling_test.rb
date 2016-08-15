@@ -104,7 +104,6 @@ class GameTest < Minitest::Test
     roll_n_times(18, 0)
     @game.roll(10)
     @game.roll(7)
-    binding.pry
     @game.roll(1)
 
     assert_equal 18, @game.score
@@ -133,11 +132,12 @@ class GameTest < Minitest::Test
   def test_should_score_a_perfect_game
     
     roll_n_times(12, 10)
+
     assert_equal 300, @game.score
   end
 
   def test_should_not_allow_rolls_with_negative_pins
-    skip
+    
     assert_raises(
       RuntimeError,
       'Pins must have a value from 0 to 10') do
