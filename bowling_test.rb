@@ -100,17 +100,18 @@ class GameTest < Minitest::Test
   end
 
   def test_should_allow_fill_balls_when_the_final_frame_is_strike
-    skip
+    
     roll_n_times(18, 0)
     @game.roll(10)
     @game.roll(7)
+    binding.pry
     @game.roll(1)
 
     assert_equal 18, @game.score
   end
 
   def test_should_allow_fill_ball_in_last_frame_if_spare
-    skip
+    
     roll_n_times(18, 0)
     @game.roll(9)
     @game.roll(1)
@@ -120,7 +121,7 @@ class GameTest < Minitest::Test
   end
 
   def test_should_allow_fill_balls_to_be_strike
-    skip
+    
     roll_n_times(18, 0)
     @game.roll(10)
     @game.roll(10)
@@ -130,7 +131,7 @@ class GameTest < Minitest::Test
   end
 
   def test_should_score_a_perfect_game
-    skip
+    
     roll_n_times(12, 10)
     assert_equal 300, @game.score
   end
