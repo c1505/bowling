@@ -24,29 +24,23 @@ class Game
     end
   end
   
-  # the last frame needs to be a special case in a different way.  each frame
-  # make into a nested array instead
-  def score
-    new_frames = []
-    @all_rolls.each_with_index do |score, index|
-      counter = 0
-      # if frame_count == index + 1
-        
-      if strike?(score)
-        arr = [score, (@all_rolls[index + 1]), (@all_rolls[index + 2]) ]
-        counter = arr.compact.reduce(:+)
-      elsif spare?(score, index)
-          counter = score + @all_rolls[index + 1]
-      else
-        counter = score
+    def score
+      new_frames = []
+      @frames.each_with_index do |frame, index|
+        if index == 9
+          counter = frame.reduce(:+)
+        elsif strike?(frame)
+          arr = [frame[0], (@frames[index + 1][0]), (@frames[index + 1][1] || @frames[index + 2][0]) ]
+          counter = arr.compact.reduce(:+)
+        elsif spare?(frame)
+          counter = frame[0] + frame[1] + @frames[index + 1][0]
+        else
+          counter = frame[0] + frame[1]
+        end
+        new_frames << counter
       end
-      new_frames << counter
+      new_frames.reduce(:+)
     end
-    print frame_count
-    new_frames.reduce(:+)
-    
-    
-  end
   
   def frame_count
     count = 0
@@ -61,20 +55,21 @@ class Game
     count
   end
     
-      
-      
-  def strike?(score)
-    score == 10
+  
+  def spare?(frame) #second implementation
+    (frame[0] + frame[1]) == 10
   end
   
-  def spare?(score, index)
-    !strike?(score) && @all_rolls.length.even? && @all_rolls.length > 1 && ( (score + @all_rolls[index - 1]) == 10 ) 
+  def strike?(frame) #second implementation
+    frame[0] == 10
   end
-  
-# 10 for the pins actually knocked down in that frame when a strike is rolled, 
-# plus 10 pins for the first roll that follows (which would have to be a strike),
-# and another 10 pins for the second roll (which would also have to be a strike).
-    
+
+
+# 105.0: flog total
+#     13.1: flog/method average
+
+#     54.9: Game#score                       bowling.rb:54
+#     24.2: Game#roll                        bowling.rb:15
 
   
 end

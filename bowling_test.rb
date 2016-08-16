@@ -106,6 +106,7 @@ class GameTest < Minitest::Test
     @game.roll(7)
     @game.roll(1)
 
+
     assert_equal 18, @game.score
   end
 
@@ -130,7 +131,6 @@ class GameTest < Minitest::Test
   end
 
   def test_should_score_a_perfect_game
-    
     roll_n_times(12, 10)
 
     assert_equal 300, @game.score
