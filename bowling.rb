@@ -1,4 +1,7 @@
-require 'pry'
+module BookKeeping
+  VERSION = 1
+end
+
 class Game
   
   attr_accessor :score
@@ -11,7 +14,7 @@ class Game
   end
   
   def roll(num)
-    raise RuntimeError unless valid_roll?(num)
+    raise RuntimeError, 'not a valid roll' unless valid_roll?(num)
     raise RuntimeError if game_over?
     if @frames.length == 10
       @frames.last << num
@@ -27,7 +30,7 @@ class Game
   end
   
   def score
-    raise RuntimeError unless game_over?
+    raise RuntimeError, 'game is not over' unless game_over?
     new_frames = []
     @frames.each_with_index do |frame, index|
       if index == 9
@@ -46,27 +49,31 @@ class Game
   end
   
     
-  def spare?(frame) #second implementation
+  def spare?(frame) 
     (frame[0] + frame[1]) == 10
   end
   
-  def strike?(frame) #second implementation
+  def strike?(frame) 
     frame[0] == 10
   end
   
   def game_over?
-    # @frames.length >= 10 && @frames.last.length > 1
-    if @frames.length >=10 && @frames.last[1]
-      @frames.last[0] + @frames.last[1] < 10 && @frames.last.length == 2
+    result = false
+    if @frames.length >= 10 && @frames.last.length == 2
+      unless spare?(@frames.last) || strike?(@frames.last)
+        result = true
+      end
+    elsif @frames.length >= 10 && @frames.last.length == 3
+      result = true
     else
-      false
+      result = false
     end
+    result
   end
   
-
+# @game.frames.length >= 10 && @game.frames.last.length == 2
   
   def valid_roll?(num)
-    # num < 0 || num > 10
     num >= 0 && num <= 10 
   end
     

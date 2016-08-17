@@ -204,7 +204,7 @@ class GameTest < Minitest::Test
   end
 
   def test_should_not_calculate_score_before_fill_balls_have_been_played
-    skip
+    
     roll_n_times(10, 10)
 
     assert_raises RuntimeError, 'Game is not yet over, cannot score!' do
@@ -221,7 +221,7 @@ class GameTest < Minitest::Test
 
   # Don't forget to define a constant VERSION inside of BookKeeping.
   def test_bookkeeping
-    skip
+    
     assert_equal 1, BookKeeping::VERSION
   end
 end
