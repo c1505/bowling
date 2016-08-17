@@ -11,7 +11,8 @@ class Game
   end
   
   def roll(num)
-    raise RuntimeError if valid_roll?(num)
+    raise RuntimeError unless valid_roll?(num)
+    raise RuntimeError if game_over?
     if @frames.length == 10
       @frames.last << num
       if @frames.last[2] && (@frames.last[1] < 10)
@@ -54,13 +55,19 @@ class Game
   end
   
   def game_over?
-    @frames.length >= 10 && @frames.last.length > 1
+    # @frames.length >= 10 && @frames.last.length > 1
+    if @frames.length >=10 && @frames.last[1]
+      @frames.last[0] + @frames.last[1] < 10 && @frames.last.length == 2
+    else
+      false
+    end
   end
   
 
   
   def valid_roll?(num)
-    num < 0 || num > 10
+    # num < 0 || num > 10
+    num >= 0 && num <= 10 
   end
     
 
