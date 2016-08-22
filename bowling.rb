@@ -1,86 +1,102 @@
-module BookKeeping
-  VERSION = 1
+# game has 10 frames
+
+# should the game or frame know about a strike?
+require 'pry'
+
+
+class Frame
+  attr_reader :points
+  def initialize
+    @pins = 10
+    @rolls_remaining = 2
+    @points = []
+  end
+
+  def over?
+    @pins == 0 || @rolls_remaining == 0
+  end
+
+  def roll(pins)
+    raise RuntimeError, 'Pin count exceeds pins on the lane' if (@pins - pins) < 0
+    @rolls_remaining -= 1
+    @pins -= pins
+    @points << pins
+  end
+
+  def strike?
+    @rolls_remaining == 1 && @pins == 0
+  end
+
+  def spare?
+    @rolls_remaining == 0 && @pins == 0
+  end
+
+  def point_total
+    @points.reduce(:+)
+  end
+
+end
+
+class FinalFrame < Frame
+  # the actual difference is in the scoring and that there is an extra roll
+  def strike?
+    false
+  end
+
+  def spare?
+    false
+  end
+
+  def over?
+    @points.length == 3 || (@points.length == 2 && @pins < 10)
+  end
+
+  def roll(pins)
+    @rolls_remaining -= 1
+    @pins -= pins
+    @points << pins
+  end
 end
 
 class Game
-  
-  attr_accessor :score
+  attr_reader :score
   attr_reader :frames
-  
   def initialize
     @score = 0
-    @frames = []
+    @frames = [Frame.new]
   end
-  
-  def roll(num)
-    raise RuntimeError, 'not a valid roll' unless valid_roll?(num)
-    raise RuntimeError, 'game is over.  no more rolls remain' if game_over?
-    if @frames.length == 10
-      @frames.last << num
-      exceeds_pins?
-    elsif @frames.length == 0 || @frames.last[0] == 10 || @frames.last.length == 2
-      @frames << [num] #add to next one
-    else
-      raise RuntimeError if (num + @frames.last[0]) > 10
-      @frames.last << num #add to current one
+
+  def roll(pins)
+    raise RuntimeError, 'Pins must have a value from 0 to 10' if pins < 0 || pins > 10
+    if @frames.last.over?
+      if @frames.length < 9
+        @frames << Frame.new
+      else
+        @frames << FinalFrame.new
+      end
     end
-  end
-  
-  def exceeds_pins?
-    # if @frames.length == 10 && !(strike? || spare?)
-    if @frames.last[2] && (@frames.last[1] < 10)
-      raise RuntimeError if @frames.last[1] + @frames.last[2] > 10
-    end
+    @frames.last.roll(pins)
   end
 
   def score
-    raise RuntimeError, 'game is not over' unless game_over?
-    scored_frames = []
-    @frames.each_with_index do |frame, index|
-      if index == 9
-        counter = frame_total(frame)
-      elsif strike?(frame)
-        arr = [frame_total(frame), (@frames[index + 1][0]), (@frames[index + 1][1] || @frames[index + 2][0]) ]
-        counter = arr.compact.reduce(:+)
-      elsif spare?(frame)
-        counter = frame_total(frame) + @frames[index + 1][0]
+    @frames.map.with_index do |frame, index|
+      if frame.strike?
+        frame.point_total + next_two_rolls(index)
+      elsif frame.spare?
+        frame.point_total + @frames[index + 1].points[0]
       else
-        counter = frame_total(frame)
+        frame.point_total
       end
-      scored_frames << counter
-    end
-    scored_frames.reduce(:+)
+    end.reduce(:+)
   end
 
-  def frame_total(frame)
-    frame.reduce(:+)
+  def next_two_rolls(index)
+    @frames[index + 1].points[0] + (@frames[index + 1].points[1] || @frames[index + 2].points[0])
   end
 
-  def spare?(frame) 
-    (frame[0] + frame[1]) == 10
-  end
-  
-  def strike?(frame) 
-    frame[0] == 10
-  end
-  
-  def game_over?
-    result = false
-    if @frames.length >= 10 && @frames.last.length == 2
-      unless spare?(@frames.last) || strike?(@frames.last)
-        result = true
-      end
-    elsif @frames.length >= 10 && @frames.last.length == 3
-      result = true
-    else
-      result = false
-    end
-    result
-  end
-  
-  def valid_roll?(num)
-    num >= 0 && num <= 10 
-  end
-    
 
+end
+
+module BookKeeping
+  VERSION = 1
 end
