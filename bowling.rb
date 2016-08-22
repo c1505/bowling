@@ -1,9 +1,3 @@
-# game has 10 frames
-
-# should the game or frame know about a strike?
-require 'pry'
-
-
 class Frame
   attr_reader :points
   def initialize
@@ -38,7 +32,7 @@ class Frame
 end
 
 class FinalFrame < Frame
-  # the actual difference is in the scoring and that there is an extra roll
+  # strike? and spare? accomplish the goal of scoring here, but are not correct
   def strike?
     false
   end
@@ -48,11 +42,23 @@ class FinalFrame < Frame
   end
 
   def over?
-    @points.length == 3 || (@points.length == 2 && @pins < 10)
+    @points.length == 3 || (@points.length == 2 && @pins > 0)
+  end
+
+  def exceeds_pins?(pins)
+    if points[1] && points[1] < 10
+      if points[1] + pins > 10
+        raise RuntimeError, 'Pin count exceeds pins on the lane' 
+      end
+    end
   end
 
   def roll(pins)
-    @rolls_remaining -= 1
+    exceeds_pins?(pins)
+    if points[1] && points[0] < 10 && (pins + points[1]) > 10
+      raise RuntimeError, 'Pin count exceeds pins on the lane' 
+    end
+
     @pins -= pins
     @points << pins
   end
@@ -68,6 +74,7 @@ class Game
 
   def roll(pins)
     raise RuntimeError, 'Pins must have a value from 0 to 10' if pins < 0 || pins > 10
+    raise RuntimeError, 'Should not be able to roll after game is over' if game_over?
     if @frames.last.over?
       if @frames.length < 9
         @frames << Frame.new
@@ -79,6 +86,7 @@ class Game
   end
 
   def score
+    raise RuntimeError, 'Score cannot be taken until the end of the game' unless game_over?
     @frames.map.with_index do |frame, index|
       if frame.strike?
         frame.point_total + next_two_rolls(index)
@@ -94,6 +102,9 @@ class Game
     @frames[index + 1].points[0] + (@frames[index + 1].points[1] || @frames[index + 2].points[0])
   end
 
+  def game_over?
+    @frames.length == 10 && @frames.last.over?
+  end
 
 end
 
