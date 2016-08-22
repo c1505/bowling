@@ -32,15 +32,6 @@ class Frame
 end
 
 class FinalFrame < Frame
-  # strike? and spare? accomplish the goal of scoring here, but are not correct
-  def strike?
-    false
-  end
-
-  def spare?
-    false
-  end
-
   def over?
     @points.length == 3 || (@points.length == 2 && @pins > 0)
   end
@@ -55,10 +46,6 @@ class FinalFrame < Frame
 
   def roll(pins)
     exceeds_pins?(pins)
-    if points[1] && points[0] < 10 && (pins + points[1]) > 10
-      raise RuntimeError, 'Pin count exceeds pins on the lane' 
-    end
-
     @pins -= pins
     @points << pins
   end
@@ -87,7 +74,7 @@ class Game
 
   def score
     raise RuntimeError, 'Score cannot be taken until the end of the game' unless game_over?
-    @frames.map.with_index do |frame, index|
+    @frames[0..8].map.with_index do |frame, index|
       if frame.strike?
         frame.point_total + next_two_rolls(index)
       elsif frame.spare?
@@ -95,7 +82,7 @@ class Game
       else
         frame.point_total
       end
-    end.reduce(:+)
+    end.reduce(:+) + @frames.last.point_total
   end
 
   def next_two_rolls(index)
