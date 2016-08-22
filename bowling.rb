@@ -37,10 +37,9 @@ class FinalFrame < Frame
   end
 
   def exceeds_pins?(pins)
-    if points[1] && points[1] < 10
-      if points[1] + pins > 10
-        raise RuntimeError, 'Pin count exceeds pins on the lane' 
-      end
+    return unless points[1]
+    if points[1] < 10 && (points[1] + pins) > 10
+      raise RuntimeError, 'Pin count exceeds pins on the lane' 
     end
   end
 
