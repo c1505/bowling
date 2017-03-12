@@ -1,4 +1,3 @@
-require 'pry'
 class Game
   class BowlingError < StandardError
   end
@@ -82,7 +81,6 @@ class Frame
 end
 
 class FinalFrame < Frame
-  # each finalframe could really have 3 frames within it in a way
   def initialize
     @rolls_remaining = 2
     @rolls = []
