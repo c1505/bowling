@@ -1,11 +1,16 @@
 require 'pry'
+class BowlingError < StandardError
+end
+
 class Game
+
   def initialize
     @pins = 0
     @frames = [Frame.new]
   end
 
   def roll(pins)
+    raise BowlingError if pins < 0 || pins > 10
     if @frames.last.closed?
       if @frames.length == 9
         frame = FinalFrame.new
@@ -63,6 +68,7 @@ class Frame
   def roll(pins)
     @rolls_remaining -= 1
     @pins_remaining -= pins
+    raise BowlingError if @pins_remaining < 0
     @rolls << pins
   end
 
@@ -91,5 +97,5 @@ class FinalFrame < Frame
     @pins_remaining = 30
   end
 
-  # def closed?
+  # def roll
 end
