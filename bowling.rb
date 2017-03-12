@@ -18,15 +18,13 @@ class Game
   def roll(pins)
     raise BowlingError if pins < 0 || pins > 10
     if @frames.last.closed?
-      if @frames.length == 9
-        frame = FinalFrame.new
-        @frames << frame
-        frame.roll(pins)
-      else
-        frame = Frame.new
-        @frames << frame
-        frame.roll(pins)
-      end
+      frame = if @frames.length == 9
+                FinalFrame.new
+              else
+                Frame.new
+              end
+      @frames << frame
+      frame.roll(pins)
     else
       @frames.last.roll(pins)
     end
@@ -34,17 +32,13 @@ class Game
 
   def score
     unless @frames.count == 10 && @frames.last.closed?
-      raise BowlingError, "Game is not complete"
+      raise BowlingError, 'Game is not complete'
     end
     total = 0
     @frames[0..8].each_with_index do |frame, index|
       total += frame.score
-      if frame.strike?
-        total += next_two_rolls(index)
-      end
-      if frame.spare?
-        total += @frames[index + 1].rolls[0]
-      end
+      total += next_two_rolls(index) if frame.strike?
+      total += @frames[index + 1].rolls[0] if frame.spare?
     end
     total += final_frame_score
   end
@@ -62,8 +56,6 @@ class Game
       @frames[index + 1].score + @frames[index + 2].rolls[0]
     end
   end
-
-
 end
 
 class Frame
@@ -82,7 +74,7 @@ class Frame
   end
 
   def closed?
-    @pins_remaining == 0 || @rolls_remaining == 0
+    @pins_remaining.zero? || @rolls_remaining.zero?
   end
 
   def score
@@ -90,13 +82,12 @@ class Frame
   end
 
   def strike?
-    @rolls_remaining == 1 && @pins_remaining == 0
+    @rolls_remaining == 1 && @pins_remaining.zero?
   end
 
   def spare?
-    @rolls_remaining == 0 && @pins_remaining == 0
+    @rolls_remaining.zero? && @pins_remaining.zero?
   end
-
 end
 
 class FinalFrame < Frame
@@ -119,9 +110,8 @@ class FinalFrame < Frame
   end
 
   def closed?
-    @rolls.count == 3 || ( @rolls.count == 2 && ( @rolls[0] + @rolls[1] < 10 ) )
+    @rolls.count == 3 || (@rolls.count == 2 && (@rolls[0] + @rolls[1] < 10))
   end
-
 end
 module BookKeeping
   VERSION = 3
