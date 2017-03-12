@@ -4,10 +4,11 @@ require 'pry'
 # refactor
   # FinalFrame
   #long conditional in roll
-class BowlingError < StandardError
-end
+
 
 class Game
+  class BowlingError < StandardError
+  end
 
   def initialize
     @pins = 0
@@ -76,7 +77,7 @@ class Frame
   def roll(pins)
     @rolls_remaining -= 1
     @pins_remaining -= pins
-    raise BowlingError if @pins_remaining < 0
+    raise Game::BowlingError if @pins_remaining < 0
     @rolls << pins
   end
 
@@ -109,7 +110,7 @@ class FinalFrame < Frame
   def roll(pins)
     @rolls_remaining -= 1
     @pins_remaining -= pins
-    raise BowlingError if @pins_remaining < 0
+    raise Game::BowlingError if @pins_remaining < 0
     @rolls << pins
     if strike? || spare?
       @pins_remaining = 10
@@ -120,8 +121,6 @@ class FinalFrame < Frame
   def closed?
     @rolls.count == 3 || ( @rolls.count == 2 && ( @rolls[0] + @rolls[1] < 10 ) )
   end
-
-
 
 end
 module BookKeeping
