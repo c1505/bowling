@@ -1,4 +1,9 @@
 require 'pry'
+#do
+# fix top level constant warning
+# refactor
+  # FinalFrame
+  #long conditional in roll
 class BowlingError < StandardError
 end
 
@@ -27,6 +32,9 @@ class Game
   end
 
   def score
+    unless @frames.count == 10 && @frames.last.closed?
+      raise BowlingError, "Game is not complete"
+    end
     total = 0
     @frames[0..8].each_with_index do |frame, index|
       total += frame.score
@@ -91,11 +99,31 @@ class Frame
 end
 
 class FinalFrame < Frame
+  # each finalframe could really have 3 frames within it in a way
   def initialize
-    @rolls_remaining = 3
+    @rolls_remaining = 2
     @rolls = []
-    @pins_remaining = 30
+    @pins_remaining = 10
   end
 
-  # def roll
+  def roll(pins)
+    @rolls_remaining -= 1
+    @pins_remaining -= pins
+    raise BowlingError if @pins_remaining < 0
+    @rolls << pins
+    if strike? || spare?
+      @pins_remaining = 10
+      @rolls_remaining = 1
+    end
+  end
+
+  def closed?
+    @rolls.count == 3 || ( @rolls.count == 2 && ( @rolls[0] + @rolls[1] < 10 ) )
+  end
+
+
+
+end
+module BookKeeping
+  VERSION = 3
 end
