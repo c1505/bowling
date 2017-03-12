@@ -7,7 +7,7 @@ class Game
 
   def roll(pins)
     if @frames.last.closed?
-      if @frames.length == 8
+      if @frames.length == 9
         frame = FinalFrame.new
         @frames << frame
         frame.roll(pins)
@@ -42,8 +42,8 @@ class Game
   end
 
   def next_two_rolls(index)
-    if @frames[index + 1].rolls.length == 2
-      @frames[index + 1].score
+    if @frames[index + 1].rolls.length >= 2
+      @frames[index + 1].rolls[0] + @frames[index + 1].rolls[1]
     else
       @frames[index + 1].score + @frames[index + 2].rolls[0]
     end
@@ -90,4 +90,6 @@ class FinalFrame < Frame
     @rolls = []
     @pins_remaining = 30
   end
+
+  # def closed?
 end
