@@ -63,13 +63,13 @@ class BowlingTest < Minitest::Test
   end
 
   def test_consecutive_strikes_each_get_the_two_roll_bonus
-    
+
     roll([10, 10, 10, 5, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     assert_equal 81, @game.score
   end
 
   def test_a_strike_in_the_last_frame_gets_a_two_roll_bonus_that_is_counted_once
-    skip
+    
     roll([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 7, 1])
     assert_equal 18, @game.score
   end
