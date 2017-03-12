@@ -1,11 +1,4 @@
 require 'pry'
-#do
-# fix top level constant warning
-# refactor
-  # FinalFrame
-  #long conditional in roll
-
-
 class Game
   class BowlingError < StandardError
   end
@@ -24,10 +17,8 @@ class Game
                 Frame.new
               end
       @frames << frame
-      frame.roll(pins)
-    else
-      @frames.last.roll(pins)
     end
+    @frames.last.roll(pins)
   end
 
   def score
