@@ -7,9 +7,15 @@ class Game
 
   def roll(pins)
     if @frames.last.closed?
-      frame = Frame.new
-      @frames << frame
-      frame.roll(pins)
+      if @frames.length == 8
+        frame = FinalFrame.new
+        @frames << frame
+        frame.roll(pins)
+      else
+        frame = Frame.new
+        @frames << frame
+        frame.roll(pins)
+      end
     else
       @frames.last.roll(pins)
     end
@@ -17,7 +23,7 @@ class Game
 
   def score
     total = 0
-    @frames.each_with_index do |frame, index|
+    @frames[0..8].each_with_index do |frame, index|
       total += frame.score
       if frame.strike?
         total += next_two_rolls(index)
@@ -26,7 +32,13 @@ class Game
         total += @frames[index + 1].rolls[0]
       end
     end
-    total
+    total += final_frame_score
+  end
+
+  private
+
+  def final_frame_score
+    @frames.last.score
   end
 
   def next_two_rolls(index)
@@ -70,4 +82,12 @@ class Frame
     @rolls_remaining == 0 && @pins_remaining == 0
   end
 
+end
+
+class FinalFrame < Frame
+  def initialize
+    @rolls_remaining = 3
+    @rolls = []
+    @pins_remaining = 30
+  end
 end
