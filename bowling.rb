@@ -20,13 +20,25 @@ class Game
     @frames.each_with_index do |frame, index|
       total += frame.score
       # total += frame.next if frame.strike?
-      total += @frames[index + 1].score if frame.strike?
+      # total += @frames[index + 1].score if frame.strike?
+      if frame.strike?
+        total += next_two_rolls(index)
+      end
       if frame.spare?
-        total += @frames[index + 1].rolls[1]
+        total += @frames[index + 1].rolls[0]
       end
     end
     total
   end
+
+  def next_two_rolls(index)
+    if @frames[index + 1].rolls.length == 2
+      @frames[index + 1].score
+    else
+      @frames[index + 1].score + @frames[index + 1].rolls[0]
+    end
+  end
+
 
 end
 
